@@ -43,5 +43,39 @@ if ($i.IpConfigurations.PublicIpAddress.Id){
 
 }
 
+# Check For Public IPs Not Associated
+
+$cPiPs = @($PiPDets.PiP)
+
+foreach ($fPiP in (Get-AzPublicIpAddress)){
+
+  if ($cPiPs -notcontains ($fPiP.IpAddress)){
+
+    $rsc = New-Object PSCustomObject
+    $rsc | Add-Member -MemberType NoteProperty -Name "Date" -Value (Get-Date -Format dd-MM-yyyy)
+
+    # Resource Details
+    $rsc | Add-Member -MemberType NoteProperty -Name "ResourceName" -Value "PiP may not be associated"
+    $rsc | Add-Member -MemberType NoteProperty -Name "ResourceLocation" -Value "PiP may not be associated"
+    $rsc | Add-Member -MemberType NoteProperty -Name "ResourceGroupName" -Value "PiP may not be associated"
+
+    # Network Security Group
+    $rsc | Add-Member -MemberType NoteProperty -Name "NSGName" -Value "PiP may not be associated"
+
+    # Update Fields
+    $rsc | Add-Member -MemberType NoteProperty -Name "PiPName" -Value ($fPiP).Name
+    $rsc | Add-Member -MemberType NoteProperty -Name "PiP" -Value ($fPiP).IpAddress
+    $rsc | Add-Member -MemberType NoteProperty -Name "PiPMethod" -Value ($fPiP).PublicIpAllocationMethod
+
+    $PiPDets += $rsc
+
+
+
+  }
+
+
+}
+
+
 # Output to JSON
 $PiPDets | ConvertTo-Json
