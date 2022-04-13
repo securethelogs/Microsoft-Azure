@@ -1,0 +1,37 @@
+# Author @Xstag0
+
+# Remember to set your RBAC permissions and AZ.storage module.
+
+
+$staccs = @(Get-AzStorageAccount)
+
+foreach ($sa in $staccs){
+
+    Write-Output "Rotation For: $($sa.StorageAccountName)" 
+
+    $saKey1 = (Get-AzStorageAccountKey -ResourceGroupName $sa.ResourceGroupName -Name $sa.StorageAccountName).Value[0]
+    $saKey2 = (Get-AzStorageAccountKey -ResourceGroupName $sa.ResourceGroupName -Name $sa.StorageAccountName).Value[1]
+
+    New-AzStorageAccountKey -ResourceGroupName $sa.ResourceGroupName -Name $sa.StorageAccountName -KeyName key1
+    New-AzStorageAccountKey -ResourceGroupName $sa.ResourceGroupName -Name $sa.StorageAccountName -KeyName key2
+
+    $NsaKey1 = (Get-AzStorageAccountKey -ResourceGroupName $sa.ResourceGroupName -Name $sa.StorageAccountName).Value[0]
+    $NsaKey2 = (Get-AzStorageAccountKey -ResourceGroupName $sa.ResourceGroupName -Name $sa.StorageAccountName).Value[1]
+
+    if ($saKey1 -ne $NsaKey1){
+
+        Write-Output "Key1 Successfully Rotated"
+
+    } else { Write-Output "Key1 Failed To Rotated" }
+
+    if ($saKey2 -ne $NsaKey2){
+
+        Write-Output "Key2 Successfully Rotated"
+
+    } else { Write-Output "Key2 Failed To Rotated" }
+
+
+    Write-Output ""
+
+}
+
